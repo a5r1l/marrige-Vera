@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сюрприз</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;800&family=Caveat:wght@700&display=swap">
+<style>
+:root{--ink:#2b2438;--paper:#fff7ec;--rose:#e8577a;--gold:#f2c14e;--g1:#ffd9c2;--g2:#e9b8d6}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:Nunito,system-ui,sans-serif;color:var(--ink);background:linear-gradient(160deg,var(--g1),var(--g2));transition:background .8s;display:flex;align-items:center;justify-content:center;overflow-x:hidden}
+main{width:min(92vw,520px);text-align:center;padding:24px 0}
+h1{font-size:2rem;margin:.2em 0 .6em;line-height:1.15}
+.opts{display:grid;gap:12px}
+.opt{font:800 1.15rem Nunito,sans-serif;padding:16px;border:3px solid var(--ink);border-radius:18px;background:var(--paper);color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:14px;text-align:left;box-shadow:0 5px 0 var(--ink);transition:transform .1s,box-shadow .1s}
+.opt:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.opt:focus-visible,.btn:focus-visible{outline:4px solid var(--rose);outline-offset:3px}
+.opt b{font-size:2.2rem}
+.dots{margin-top:22px;letter-spacing:8px;font-size:1.1rem}
+.btn{font:800 1.3rem Nunito,sans-serif;padding:14px 28px;border-radius:999px;border:3px solid var(--ink);cursor:pointer;color:var(--ink)}
+#yes{background:var(--rose);color:#fff;transform-origin:center;transition:transform .2s}
+#no{background:var(--paper)}
+.row{display:flex;gap:16px;justify-content:center;align-items:center;min-height:130px;flex-wrap:wrap}
+.hero{font-size:5rem;margin:0}
+.scene{position:relative;height:300px;overflow:hidden;border-radius:24px;border:3px solid var(--ink);background:linear-gradient(var(--g1),var(--g2))}
+.scene .place{position:absolute;top:10px;left:0;right:0;font-size:4.5rem}
+.scene .ground{position:absolute;bottom:0;left:0;right:0;height:70px;background:rgba(43,36,56,.25)}
+.pet{position:absolute;bottom:40px;left:-120px;font-size:5.5rem;animation:walk 2.4s ease-out forwards}
+.ring{position:absolute;bottom:130px;left:-60px;font-size:2.6rem;animation:walk 2.4s ease-out forwards,hop 2.4s forwards}
+@keyframes walk{to{left:calc(50% - 50px)}}
+@keyframes hop{50%{transform:translateY(-14px)}}
+.ring.on{animation:none;left:calc(50% - 20px);bottom:130px;animation:slip 1.6s ease-in-out forwards}
+@keyframes slip{0%{transform:scale(1)}50%{transform:translate(70px,-40px) scale(2.2) rotate(20deg)}100%{transform:translate(70px,-10px) scale(1.5) rotate(0)}}
+.hand{position:absolute;bottom:60px;left:calc(50% + 40px);font-size:5rem;opacity:0;transition:opacity .5s}
+.hand.on{opacity:1}
+.cert{background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:20px;box-shadow:0 8px 0 rgba(43,36,56,.3)}
+.cert h2{margin:0 0 8px;font-size:1.6rem}
+.cert p{margin:6px 0}
+#pad{width:100%;height:110px;background:#fff;border:2px dashed var(--ink);border-radius:10px;touch-action:none;display:block;margin:10px 0}
+.hint{font-size:.9rem;opacity:.7}
+.fall{position:fixed;top:-40px;font-size:1.8rem;animation:fall linear forwards;pointer-events:none}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition:none!important}}
+.hero img,.hero span{height:110px;font-size:5rem}
+.opt b{display:flex;width:56px;justify-content:center}.opt img{height:52px;max-width:56px;object-fit:contain}
+.scene .place img{height:90px}.pet img{height:110px}.ring img{height:52px}.place span{font-size:4.5rem}
+.fall img{height:36px}
+body{background-size:cover;background-position:center;background-attachment:fixed}
+main.card{background:rgba(255,247,236,.88);border:3px solid var(--ink);border-radius:24px;padding:24px 20px}
+main.clear{width:min(96vw,720px)}
+.scene{height:60vh;min-height:320px;border:0;border-radius:0;background:none;overflow:visible}
+.scene .ground,.scene .place img{display:none}
+main.clear h1,main.clear #cap{background:rgba(255,247,236,.9);display:inline-block;padding:8px 18px;border-radius:16px}
+.ov{position:fixed;inset:0;background:rgba(20,15,30,.88);z-index:9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;color:#fff;text-align:center}
+.ov img{max-height:68vh;max-width:92vw;border-radius:12px}
+.ov a.btn{text-decoration:none}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+
+const NAME_FROM = "Марк";         
+const NAME_TO   = "Вера";       
+const WIFE_LABEL = "Любимая жена";  
+const SIGN_LABEL = "подпись";  
+
+const GIFT = {e:"🎁", t:"Подарок", img:"img/gift.png"};
+const steps = [
+ {k:"place", q:"Куда сбежим вдвоём?", o:[
+  {e:"🏖️",t:"Пляж",img:"img/place-beach.png",g:"#ffd9a8,#6ec6ff"},
+  {e:"🏔️",t:"Горы",img:"img/place-mountains.png",g:"#d6e2ff,#7d8fc4"},
+  {e:"🌃",t:"Ночной город",img:"img/place-city.png",g:"#8a5fc4,#2a2150"},
+  {e:"🌲",t:"Лес",img:"img/place-forest.jpg",g:"#c3e6b5,#4c8a6a"}]},
+ {k:"pet", q:"Кто составит нам компанию?", o:[
+  {e:"🐶",t:"Собака",img:"img/pet-dog.png"},
+  {e:"🦝",t:"Енот",img:"img/pet-raccoon.png"},
+  {e:"🐱",t:"Кот",img:"img/pet-cat.png"}]},
+ {k:"ring", q:"Какой подарок возьмём?", hide:true, o:[
+  {e:"💍",t:"Золотой",img:"img/ring-gold.png"},
+  {e:"💎",t:"С огромным камнем",img:"img/ring-gem.png"},
+  {e:"🍩",t:"Съедобный",img:"img/ring-donut.png"}]},
+ {k:"food", q:"Чем будем угощаться?", o:[
+  {e:"🍕",t:"Пицца",img:"img/food-pizza.png"},
+  {e:"🍣",t:"Суши",img:"img/food-sushi.png"},
+  {e:"🎂",t:"Торт",img:"img/food-cake.png"},
+  {e:"🎂",t:"Сыр-косичка",img:"img/food-chese.png"}]}
+];
+
+const pick = {}, app = document.getElementById("app"), root = document.documentElement;
+let i = 0;
+const $ = (h) => { app.className = "card"; app.innerHTML = h; };
+const pic = (o, c = "") => `<img class="${c}" src="${o.img}" alt="${o.t}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'${c}',textContent:'${o.e}'}))">`;
+
+function showIntro() {
+  $(`<p class="hero">${pic(GIFT)}</p><h1>${NAME_TO}, у меня для тебя сюрприз</h1>
+     <p>Но сначала ответь на пару вопросов.</p><button class="btn" id="start" style="background:var(--gold)">Начать</button>`);
+  document.getElementById("start").onclick = showStep;
+}
+
+function showStep() {
+  const s = steps[i];
+  $(`<h1>${s.q}</h1><div class="opts">${s.o.map((o,n)=>`<button class="opt" data-n="${n}"><b>${pic(s.hide ? GIFT : o)}</b>${o.t}</button>`).join("")}</div>
+     <div class="dots">${steps.map((_,n)=>n<=i?"●":"○").join("")}</div>`);
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const o = s.o[b.dataset.n]; pick[s.k] = o;
+    if (s.k === "place") document.body.style.backgroundImage = `url("${o.img}"), linear-gradient(var(--g1), var(--g2))`;
+    if (o.g) { const [a,c] = o.g.split(","); root.style.setProperty("--g1",a); root.style.setProperty("--g2",c); }
+    if (++i < steps.length) showStep(); else showAsk();
+  });
+}
+
+function showAsk() {
+  $(`<p class="hero">${pic(pick.pet)}</p><h1>${NAME_TO}, станешь моей женой?</h1>
+     <div class="row"><button class="btn" id="yes">Да</button><button class="btn" id="no">Нет</button></div>`);
+  const yes = document.getElementById("yes"), no = document.getElementById("no");
+  let scale = 1;
+  const run = (e) => {
+    e.preventDefault(); no.style.position = "fixed";
+    no.style.left = Math.random() * (innerWidth - 110) + "px"; no.style.top = Math.random() * (innerHeight - 70) + "px";
+    scale = Math.min(scale + .25, 2.2); yes.style.transform = `scale(${scale})`;
+  };
+  ["pointerenter","pointerdown","click"].forEach(t => no.addEventListener(t, run));
+  yes.onclick = showScene;
+}
+
+function confetti() {
+  const set = [{e:"💖"},{e:"✨"},{e:"🎉"}, pick.ring, pick.pet];
+  for (let n = 0; n < 40; n++) {
+    const o = set[n % set.length], e = document.createElement("div"); e.className = "fall";
+    e.innerHTML = o.img ? pic(o) : o.e; e.style.left = Math.random()*100 + "vw";
+    e.style.animationDuration = 2 + Math.random()*3 + "s"; document.body.appendChild(e); setTimeout(() => e.remove(), 5500);
+  }
+}
+
+function showScene() {
+  $(`<h1>Ура! 🎉</h1><div class="scene"><div class="place">${pic(pick.place)}</div><div class="ground"></div>
+     <div class="pet">${pic(pick.pet)}</div><div class="ring">${pic(pick.ring)}</div><div class="hand">🫱</div></div>
+     <p id="cap" style="font-weight:800;margin-top:14px">${pick.pet.t} несёт кольцо…</p><div id="go"></div>`);
+  app.className = "clear";
+  setTimeout(() => { document.querySelector(".hand").classList.add("on"); document.querySelector(".ring").classList.add("on"); document.getElementById("cap").textContent = "Надеваем…"; }, 2600);
+  setTimeout(() => { confetti(); document.getElementById("cap").textContent = "Готово! Осталось подписать документы."; document.getElementById("go").innerHTML = '<button class="btn" id="sign" style="background:var(--gold)">К свидетельству</button>'; document.getElementById("sign").onclick = showCert; }, 4400);
+}
+
+function showCert() {
+  const d = new Date().toLocaleDateString("ru-RU");
+  $(`<div class="cert"><h2>Свидетельство</h2>
+     <p>${NAME_FROM} и ${NAME_TO} теперь семья</p>
+     <p>${WIFE_LABEL}: <b>${NAME_TO}</b></p>
+     <p>Место: ${pick.place.t}<br>Кольцо вынес: ${pick.pet.t}<br>Угощение: ${pick.food.t}</p><p>Дата: ${d}</p>
+     <canvas id="pad"></canvas><p class="hint">Распишись пальцем или мышкой</p></div>
+     <div class="row" style="min-height:90px"><button class="btn" id="save" style="background:var(--rose);color:#fff" disabled>Сохранить картинку</button></div>`);
+  const pad = document.getElementById("pad"), c = pad.getContext("2d");
+  pad.width = pad.clientWidth * 2; pad.height = pad.clientHeight * 2;
+  c.lineWidth = 5; c.lineCap = "round"; c.strokeStyle = "#2b2438";
+  let down = false, signed = false;
+  const pos = (e) => { const r = pad.getBoundingClientRect(); return [(e.clientX-r.left)*2, (e.clientY-r.top)*2]; };
+  pad.onpointerdown = (e) => { down = true; c.beginPath(); c.moveTo(...pos(e)); pad.setPointerCapture(e.pointerId); };
+  pad.onpointermove = (e) => { if (!down) return; c.lineTo(...pos(e)); c.stroke(); if (!signed) { signed = true; document.getElementById("save").disabled = false; } };
+  pad.onpointerup = () => down = false;
+  document.getElementById("save").onclick = () => { confetti(); exportImg(pad, d); };
+}
+
+const load = (src) => new Promise(r => { const m = new Image(); m.onload = () => r(m); m.onerror = () => r(null); m.src = src; });
+function drawPic(x, m, o, cx, cy, size) {
+  if (m) { const k = size / Math.max(m.width, m.height); x.drawImage(m, cx - m.width*k/2, cy - m.height*k/2, m.width*k, m.height*k); }
+  else { x.font = size*.85 + "px sans-serif"; x.fillText(o.e, cx, cy + size*.3); }
+}
+
+async function exportImg(pad, d) {
+  try {
+    await document.fonts.ready;
+    const [mp, mt, mr] = await Promise.all([pick.place, pick.pet, pick.ring].map(o => load(o.img)));
+    const W = 900, H = 1200, c = Object.assign(document.createElement("canvas"), {width: W, height: H}), x = c.getContext("2d");
+    const cs = getComputedStyle(root), g = x.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, cs.getPropertyValue("--g1")); g.addColorStop(1, cs.getPropertyValue("--g2"));
+    x.fillStyle = g; x.fillRect(0, 0, W, H);
+    if (mp) { const k = Math.max(W/mp.width, H/mp.height); x.drawImage(mp, (W-mp.width*k)/2, (H-mp.height*k)/2, mp.width*k, mp.height*k); }
+    else { x.textAlign = "center"; drawPic(x, null, pick.place, W/2, 300, 260); }
+    x.textAlign = "center";
+    drawPic(x, mt, pick.pet, W/2 - 100, 470, 280); drawPic(x, mr, pick.ring, W/2 + 130, 430, 130);
+    x.fillStyle = "rgba(255,247,236,.93)"; x.strokeStyle = "#2b2438"; x.lineWidth = 6;
+    x.beginPath(); if (x.roundRect) x.roundRect(60, 650, W-120, 450, 28); else x.rect(60, 650, W-120, 450); x.fill(); x.stroke();
+    x.fillStyle = "#2b2438"; x.font = "800 52px Nunito, sans-serif"; x.fillText("Свидетельство", W/2, 722);
+    x.font = "500 31px Nunito, sans-serif";
+    [`${NAME_FROM} и ${NAME_TO} теперь семья`, `${WIFE_LABEL}: ${NAME_TO}`, `${pick.place.t} · ${pick.pet.t} · ${pick.food.t}`, `Дата: ${d}`]
+      .forEach((t, n) => x.fillText(t, W/2, 782 + n * 45));
+    x.drawImage(pad, W/2 - 130, 950, 260, 260 * pad.height / pad.width);
+    x.font = "600 24px Nunito, sans-serif"; x.fillText(`${SIGN_LABEL}: ${NAME_TO}`, W/2, 1075);
+    showResult(c.toDataURL("image/png"));
+  } catch (err) {
+    alert("Не получилось сохранить");
+  }
+}
+function showResult(url) {
+  const o = document.createElement("div"); o.className = "ov";
+  o.innerHTML = `<img src="${url}" alt="Свидетельство"><p>Зажми картинку и выбери «Сохранить», или жми кнопки</p>
+    <div class="row" style="min-height:0"><a class="btn" style="background:var(--gold)" href="${url}" download="svidetelstvo.png">Скачать</a>
+    <button class="btn" id="shr" style="background:var(--rose);color:#fff">Поделиться</button><button class="btn" id="cls">Закрыть</button></div>`;
+  document.body.appendChild(o);
+  o.querySelector("#cls").onclick = () => o.remove();
+  o.querySelector("#shr").onclick = async () => {
+    try { const f = new File([await (await fetch(url)).blob()], "svidetelstvo.png", {type: "image/png"}); await navigator.share({files: [f]}); }
+    catch (e) {  }
+  };
+}
+showIntro();
+</script>
+</body>
+</html>
